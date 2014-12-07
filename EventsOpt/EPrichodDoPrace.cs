@@ -1,9 +1,9 @@
 ﻿using Santa.Abstract;
 using Santa.Jadro;
 
-namespace Santa.Events
+namespace Santa.EventsOpt
 {
-    public class EPrichodDoPrace : Udalost
+    public class EPrichodDoPrace : UdalostOpt
     {
         private Elf _elf;
         public EPrichodDoPrace(double prichod, Elf elf)
@@ -12,9 +12,8 @@ namespace Santa.Events
             SetCas(prichod);
         }
 
-        public override void Vykonaj(Jadro.Jadro jadro)
+        public override void Vykonaj(JadroOpt jadro)
         {
-            //Console.WriteLine("Prichod elfa  : " + _elf.Id + "  , cas : " + DateTime.FromOADate(GetCas()).ToString());
             jadro.PrichodElfaDoPrace(_elf);
         }
     }

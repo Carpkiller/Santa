@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>icsharpcode-SharpZipLib-c49a22d\bin\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,6 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract\PrvokSystemu.cs" />
+    <Compile Include="Abstract\UdalostOpt.cs" />
+    <Compile Include="EventsOpt\EKoniecNaVyrobku.cs" />
+    <Compile Include="EventsOpt\EPrekonvertujHracky.cs" />
+    <Compile Include="EventsOpt\EPrichodDoPrace.cs" />
+    <Compile Include="EventsOpt\EPrichodNovehoVyrobku.cs" />
+    <Compile Include="EventsOpt\EZaciatokPraceNaVyrobku.cs" />
     <Compile Include="Events\EKoniecPraceNaVyrobku.cs" />
     <Compile Include="Events\EPrichodDoPrace.cs" />
     <Compile Include="Events\EZacatiePraceNaVyrobku.cs" />
@@ -65,9 +68,12 @@
     <Compile Include="Jadro\Elf.cs" />
     <Compile Include="Jadro\Hracka.cs" />
     <Compile Include="Jadro\Jadro.cs" />
+    <Compile Include="Jadro\JadroOpt.cs" />
     <Compile Include="Jadro\KalendarUdalosti.cs" />
+    <Compile Include="Jadro\KalendarUdalostiOpt.cs" />
     <Compile Include="Jadro\Logovac.cs" />
     <Compile Include="Jadro\PriorFrontEvents.cs" />
+    <Compile Include="Jadro\PriorFrontHracka.cs" />
     <Compile Include="Jadro\PriorFrontWorkers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using Santa.Abstract;
 using Santa.Events;
-using ICSharpCode.SharpZipLib.Zip;
+//using ICSharpCode.SharpZipLib.Zip;
 
 
 namespace Santa.Jadro
@@ -94,7 +94,7 @@ namespace Santa.Jadro
             }
             Console.WriteLine(DateTime.Now);
 
-            //VytvorLogSubor();
+            VytvorLogSubor();
         }
 
         private void Init()
@@ -152,7 +152,7 @@ namespace Santa.Jadro
 
                 var hracka = new Hracka(int.Parse(values[0]),
                     new DateTime(int.Parse(date[0]), int.Parse(date[1]), int.Parse(date[2]), int.Parse(date[3]),
-                        int.Parse(date[4]), 0).ToOADate(), int.Parse(values[2]));
+                        int.Parse(date[4]), 0).ToOADate(), int.Parse(values[2]), false);
 
                 totalMinutes += int.Parse(values[2]);
 
@@ -186,6 +186,10 @@ namespace Santa.Jadro
             //var hracka =(Hracka) _listPrichodov[_aktualnyIndex];
             var hracka = _arrayHraciek[_aktualnyIndex];
             _aktualnyIndex++;
+            if (hracka.Id == 9214)
+            {
+
+            }
             return hracka;
         }
 
@@ -248,7 +252,8 @@ namespace Santa.Jadro
 
         public void NaplanujKoniecPrace(Elf worker, Hracka hracka)
         {
-            _listLog.Add(new Logovac(hracka.Id, worker.Id, worker.ZaciatokPRace, hracka.DlzkaVyroby));
+            var dlzkaPraceMin = int.Parse(Math.Ceiling(hracka.DlzkaVyroby / worker.Vykonnost).ToString());
+            _listLog.Add(new Logovac(hracka.Id, worker.Id, worker.ZaciatokPRace, dlzkaPraceMin));
             PocetVolnych--;
             worker.JeVolny = false;
             if (ZmenaElfov != null) //vyvolani udalosti
@@ -260,27 +265,29 @@ namespace Santa.Jadro
         private double VypocitajKoniecPrace(Elf worker, Hracka hracka)
         {
             var dlzka = hracka.DlzkaVyroby/worker.Vykonnost;
-            //var dlzkaPraceMin = Math.Ceiling(hracka.DlzkaVyroby / worker.Vykonnost);
-            var dlzkaPraceMin = hracka.DlzkaVyroby;
+            var dlzkaPraceMin = Math.Ceiling(hracka.DlzkaVyroby / worker.Vykonnost);
+            hracka.DlzkaSkutocnejVyroby = int.Parse(dlzkaPraceMin.ToString());
+            //var dlzkaPraceMin = hracka.DlzkaVyroby;
             //var dlzkaPrace = new DateTime(0, 0, 0, 0, dlzkaPraceMin, 0).ToOADate();
             var koniec = DateTime.FromOADate(_simCas).AddMinutes(dlzkaPraceMin);
-            if (worker.Id == 513)// && hracka.Id == 3400)
-            {
 
-            }
             if (koniec.Second > 0)
             {
                 var d = DateTime.FromOADate(_simCas);
                 koniec = new DateTime(koniec.Year, koniec.Month, koniec.Day, koniec.Hour, koniec.Minute, 0).AddMinutes(1);
             }
             var prichod = koniec.ToOADate();
+            if (worker.Id == 125)// && hracka.Id == 2149472)  // 22965  2150227,737,
+            {
+                //Console.WriteLine("Koniec prace : "+worker.Id+ " - " +worker.Vykonnost+" - "+worker.DostupnyOd +" - "+hracka.Id +" - "+hracka.DlzkaVyroby+" - "+hracka.DlzkaSkutocnejVyroby+" - "+koniec.ToString());
+            }
             //Console.WriteLine(DateTime.FromOADate(hracka.PrichodDoSystemu) +" - "+DateTime.FromOADate(prichod));
             return prichod;
         }
 
         public void UvolniWorkera(Elf worker, Hracka hracka)
         {
-            if (worker.Id == 513 && hracka.Id == 3400)
+            if (worker.Id == 103 && hracka.Id == 2149472)
             {
 
             }
@@ -290,57 +297,83 @@ namespace Santa.Jadro
             if (ZmenaElfov != null) //vyvolani udalosti
                 ZmenaElfov();
 
+            var sanctioned = 0.0;
+            var unsanctioned = 0.0;
+            PocitajHodiny(worker, hracka, false, out sanctioned, out unsanctioned);
+
             var presahHodin = 0.0;
-            //var dlzkaPraceMin = Math.Ceiling(hracka.DlzkaVyroby/worker.Vykonnost);
-            var dlzkaPraceMin = hracka.DlzkaVyroby;
+            var dlzkaPraceMin = Math.Ceiling(hracka.DlzkaVyroby/worker.Vykonnost);
+            //var dlzkaPraceMin = hracka.DlzkaVyroby;
             var koniecPrace = (worker.ZaciatokPRace).AddMinutes(dlzkaPraceMin);
             var porDate = (worker.ZaciatokPRace).Date;
             worker.DostupnyOd = koniecPrace;
             var ss = DateTime.FromOADate(_simCas);
             var date = (worker.ZaciatokPRace);
             var presah = koniecPrace - new DateTime(date.Year, date.Month, date.Day, 19, 0, 0);
-            if (koniecPrace.Hour >= 19 && koniecPrace.Date == porDate.Date)
-            {
-                worker.DostupnyOd =
-                    new DateTime(date.Year, date.Month, date.Day, 9, 0, 0).AddDays(1).Add(presah);
-                presahHodin = presah.TotalHours;
-            }
+            //if (koniecPrace.Hour >= 19 && koniecPrace.Date == porDate.Date)
+            //{
+            //    worker.DostupnyOd =
+            //        new DateTime(date.Year, date.Month, date.Day, 9, 0, 0).AddDays(1).Add(presah);
+            //    presahHodin = presah.TotalHours;
+            //}
 
             //var dobryTime = (hracka.DlzkaVyroby/worker.Vykonnost)/60;
             //worker.Vykonnost = worker.Vykonnost*(Math.Pow(1.02, dobryTime))*(Math.Pow(0.9, presahHodin));
             worker.Vykonnost = VypocitajRating(worker, hracka);
 
             //if ((DateTime.FromOADate(_simCas).Hour < 19 && DateTime.FromOADate(_simCas).Hour >= 9) && (worker.DostupnyOd.Hour < 19 && worker.DostupnyOd.Hour >= 9) && _listNezadanychVyrobkov.Count > 0)
+
+            
             if ((DateTime.FromOADate(_simCas).Hour < 19 && DateTime.FromOADate(_simCas).Hour >= 9) &&
-                (worker.DostupnyOd.Hour < 19 && worker.DostupnyOd.Hour >= 9) && _aktualnyIndex - OdIndex > 0)
+                (worker.DostupnyOd.Hour < 19 && worker.DostupnyOd.Hour >= 9) && _aktualnyIndex - OdIndex > 0 && unsanctioned==0)
             {
-                var ww = DateTime.FromOADate(_simCas);
-                SpracujNezadaneHracky(worker);
+                if (worker.Id == 125)
+                {
+                    //Console.WriteLine("Pokracovanie na dalsej : " + worker.Id + " - " + worker.Vykonnost + " - " + worker.DostupnyOd + " - " + hracka.Id + " - " + hracka.DlzkaVyroby + " - " + hracka.DlzkaSkutocnejVyroby + " - " + DateTime.FromOADate(_simCas));
+                }
+
+                if (_arrayHraciek[OdIndex].PrichodDoSystemu < _simCas)
+                {
+                    SpracujNezadaneHracky(worker);
+                }
+                
                 return;
             }
-            if (DateTime.FromOADate(_simCas).Hour >= 19 || DateTime.FromOADate(_simCas).Hour < 9)
+            if (DateTime.FromOADate(_simCas).Hour >= 19 || DateTime.FromOADate(_simCas).Hour < 9 || unsanctioned>0)
             {
                 var kk = worker.ZaciatokPRace.AddMinutes(hracka.DlzkaVyroby);
-                var sanctioned = 0.0;
-                var unsanctioned = 0.0;
-                PocitajHodiny(worker, hracka, false, out sanctioned, out unsanctioned);
-                var pocetDni = ((int) unsanctioned/60)/10;
-                var pocetPresah = unsanctioned/60 - pocetDni*10;
+                //var sanctioned = 0.0;
+                //var unsanctioned = 0.0;
+                //PocitajHodiny(worker, hracka, false, out sanctioned, out unsanctioned);
+                var pocetDni = 1;
+                pocetDni += ((int) unsanctioned/60)/10;
+                var pocetPresah = unsanctioned/60 - (pocetDni-1)*10;
 
-                var dostupnost =
-                    new DateTime(koniecPrace.Year, koniecPrace.Month, koniecPrace.Day, 9, 0, 0).AddDays(pocetDni)
+                var dostupnost =  koniecPrace.AddDays(pocetDni)
                         .AddHours(pocetPresah);
-                if (dostupnost.Second > 0)
+
+                    
+                if (dostupnost.Hour >= 19)
                 {
-                    //var d = DateTime.FromOADate(_simCas);
-                    dostupnost = new DateTime(dostupnost.Year, dostupnost.Month, dostupnost.Day, dostupnost.Hour, dostupnost.Minute, 0).AddMinutes(1);
+                    dostupnost = new DateTime(dostupnost.Year, dostupnost.Month, dostupnost.Day, 9, 0, 0).AddDays(1);
+                }
+                if (dostupnost.Hour < 9)
+                {
+                    dostupnost = new DateTime(dostupnost.Year, dostupnost.Month, dostupnost.Day, 9, 0, 0);
                 }
                 //PocetVolnych++;
                 worker.JeVolny = true;
+                worker.DostupnyOd = dostupnost;
                 //if (ZmenaElfov != null) //vyvolani udalosti
                 //    ZmenaElfov();
                 _kalendarUdalosti.Vloz(new EPrichodDoPrace(dostupnost.ToOADate(), worker),
                     dostupnost.ToOADate());
+
+                if (worker.Id == 125)
+                {
+                    //Console.WriteLine("Oddych : " + worker.Id + " - " + worker.Vykonnost + " - " + worker.DostupnyOd + " - " + hracka.Id + " - " + hracka.DlzkaVyroby + " - " + hracka.DlzkaSkutocnejVyroby + " - " + dostupnost);
+                }
+
                 return;
             }
             worker.JeVolny = true;
@@ -356,12 +389,12 @@ namespace Santa.Jadro
         {
             var sanctioned = 0.0;
             var unsanctioned = 0.0;
-            PocitajHodiny(worker, hracka, true, out sanctioned, out unsanctioned);
-
-            if (worker.Id == 513 && hracka.Id == 3400)
+            if (worker.Id == 99)
             {
 
             }
+
+            PocitajHodiny(worker, hracka, false, out sanctioned, out unsanctioned);
 
             var vykonnost = worker.Vykonnost*(Math.Pow(1.02, sanctioned/60.0))*(Math.Pow(0.9, unsanctioned/60.0));
 
@@ -370,6 +403,11 @@ namespace Santa.Jadro
             if (vykonnost < 0.25)
                 vykonnost = 0.25;
 
+
+            if (worker.Id == 99)
+            {
+
+            }
             return vykonnost;
         }
 
@@ -377,12 +415,14 @@ namespace Santa.Jadro
         {
             sanctioned = 0.0;
             unsanctioned = 0.0;
-            var dlzkaPraceMin = 0.0;
+            //var dlzkaPraceMin = 0.0;
 
-            if (rating)
-                dlzkaPraceMin = hracka.DlzkaVyroby;
-            else
-                dlzkaPraceMin = Math.Ceiling(hracka.DlzkaVyroby*worker.Vykonnost);
+            //if (rating)
+            //    dlzkaPraceMin = hracka.DlzkaVyroby;
+            //else
+            //    dlzkaPraceMin = Math.Ceiling(hracka.DlzkaVyroby/worker.Vykonnost);
+
+            var dlzkaPraceMin = hracka.DlzkaSkutocnejVyroby;
 
             var koniec = worker.ZaciatokPRace.AddMinutes(dlzkaPraceMin);
             //var pocetDni = (koniec - worker.ZaciatokPRace).Days;
@@ -390,7 +430,7 @@ namespace Santa.Jadro
 
             for (DateTime i = worker.ZaciatokPRace.Date; i < koniec.Date; i = i.AddDays(1))
             {
-                var e = i;
+                //var e = i;
                 pocetDni++;
             }
             var mc = koniec - worker.ZaciatokPRace;
@@ -412,7 +452,7 @@ namespace Santa.Jadro
                 if (koniec.Day ==
                     new DateTime(worker.ZaciatokPRace.Year, worker.ZaciatokPRace.Month, worker.ZaciatokPRace.Day, 9, 0,
                         0).AddDays(pocetDni).Day &&
-                    koniec <
+                    koniec <=
                     new DateTime(worker.ZaciatokPRace.Year, worker.ZaciatokPRace.Month, worker.ZaciatokPRace.Day, 9, 0,
                         0).AddDays(pocetDni))
                 {
@@ -426,7 +466,7 @@ namespace Santa.Jadro
                     (koniec >
                      new DateTime(worker.ZaciatokPRace.Year, worker.ZaciatokPRace.Month, worker.ZaciatokPRace.Day, 9, 0,
                          0).AddDays(pocetDni) &&
-                     koniec <
+                     koniec <=
                      new DateTime(worker.ZaciatokPRace.Year, worker.ZaciatokPRace.Month, worker.ZaciatokPRace.Day, 19, 0,
                          0).AddDays(pocetDni)))
                 {
@@ -445,6 +485,7 @@ namespace Santa.Jadro
                 {
                     unsanctioned +=
                         (koniec - new DateTime(koniec.Year, koniec.Month, koniec.Day, 0, 0, 0)).TotalMinutes - 600;
+                    sanctioned += 600;
                 }
 
                 if (koniec >
@@ -482,7 +523,7 @@ namespace Santa.Jadro
             {
                 sanctioned += (koniec - worker.ZaciatokPRace).TotalMinutes;
             }
-            if (worker.Id == 513 && hracka.Id == 3400)
+            if (worker.Id == 236 && hracka.Id == 3277)
             {
 
             }
@@ -555,13 +596,13 @@ namespace Santa.Jadro
         private void VytvorLogSubor()
         {
             var c = _listLog.Count;
-            using (var outputStream = File.Create("example2.zip"))
-            using (var zipStream = new ZipOutputStream(outputStream))
-            {
-                zipStream.SetLevel(6);
-                zipStream.PutNextEntry(new ZipEntry("example.csv"));
+            //using (var outputStream = File.Create("example3.zip"))
+            //using (var zipStream = new ZipOutputStream(outputStream))
+            //{
+            //    zipStream.SetLevel(6);
+            //    zipStream.PutNextEntry(new ZipEntry("example.csv"));
 
-                using (var writer = new StreamWriter(zipStream))
+                using (var writer = new StreamWriter("example9.csv"))
                 {
                     writer.WriteLine("ToyId,ElfId,StartTime,Duration");
                     foreach (Logovac line in _listLog)
@@ -569,7 +610,7 @@ namespace Santa.Jadro
                         writer.WriteLine(line.ToString());
                     }
                 }
-            }
+          //  }
 
 
             //using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"example.csv"))
@@ -581,7 +622,12 @@ namespace Santa.Jadro
             //        file.WriteLine(line.ToString());
             //    }
             //}
-            Console.WriteLine(DateTime.Now);
+            Console.WriteLine("Koniec zapisu "+DateTime.Now);
+        }
+
+        public void PrekonvertujHracky()
+        {
+            throw new NotImplementedException();
         }
     }
 }
