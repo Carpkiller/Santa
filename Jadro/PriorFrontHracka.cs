@@ -27,6 +27,7 @@ namespace Santa.Jadro
         public Array GetArray()
         {
             _priorFront.Sort();
+            _priorFront.RemoveRange(9999990,9);
             return _priorFront.ToArray();
         }
     }

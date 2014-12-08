@@ -35,7 +35,7 @@ namespace Santa.Jadro
             var hracky = new Hracka[10000000];
             var vstup = NacitajPrichodyHraciek(out hracky);
 
-            for (double i = 1.3; i < 4; i+=0.1)
+            for (double i = 0.278; i <= 0.278; i+=0.002)
             {
                 PARAMETER1 = i;
                 _listPrichodov = vstup;
@@ -74,7 +74,7 @@ namespace Santa.Jadro
 
         private void Init()
         {
-            indexHorny = 9999999;
+            indexHorny = 9999990;
             indexDolny = 0;
             _aktualnyIndex = 0;
             OdIndex = 0;
@@ -529,12 +529,18 @@ namespace Santa.Jadro
             //        file.WriteLine(line.ToString());
             //    }
             //}
-            Console.WriteLine(DateTime.Now);
+            Console.WriteLine("Vytvorenie suboru "+DateTime.Now);
         }
 
         public void PrekonvertujHracky()
         {
             ArrayHraciek = listHraciekUtriedeny.GetArray() as Hracka[];
+            
+            //var c = ArrayHraciek.Reverse().ToArray();
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    Console.WriteLine(c[i].Id +" - "+c[i].DlzkaVyroby);
+            //}
         }
     }
 }
