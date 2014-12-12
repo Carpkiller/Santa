@@ -64,5 +64,10 @@ namespace Santa.Jadro
         {
             return _listWorkers.Length;
         }
+
+        public Elf Get(int i)
+        {
+            return _listWorkers[i];
+        }
     }
 }

@@ -4,6 +4,7 @@ using Santa.Abstract;
 
 namespace Santa.Jadro
 {
+    [Serializable]
     public class Hracka : PrvokSystemu, IComparer, IComparable
     {
         public int Id { get; set; }

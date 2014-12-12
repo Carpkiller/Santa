@@ -27,7 +27,12 @@ namespace Santa.Jadro
         public Array GetArray()
         {
             _priorFront.Sort();
-            _priorFront.RemoveRange(9999990,9);
+            //_priorFront.RemoveRange(9999990,9);
+
+            for (int i = 0; i < 20; i++)
+            {
+               // Console.WriteLine(_priorFront[_priorFront.Count - 1].DlzkaVyroby);
+            }
             return _priorFront.ToArray();
         }
     }

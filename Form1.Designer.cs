@@ -36,10 +36,18 @@
             this.labelSimulacnyCas = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxPocetCakajucich = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBoxParameter2 = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.textBoxParameter1 = new System.Windows.Forms.TextBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.textBoxOutput = new System.Windows.Forms.TextBox();
+            this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
             // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.Location = new System.Drawing.Point(726, 12);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(94, 40);
@@ -82,6 +90,7 @@
             // 
             // labelSimulacnyCas
             // 
+            this.labelSimulacnyCas.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelSimulacnyCas.AutoSize = true;
             this.labelSimulacnyCas.Location = new System.Drawing.Point(12, 250);
             this.labelSimulacnyCas.Name = "labelSimulacnyCas";
@@ -105,11 +114,89 @@
             this.textBoxPocetCakajucich.Size = new System.Drawing.Size(100, 20);
             this.textBoxPocetCakajucich.TabIndex = 6;
             // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(494, 159);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(70, 13);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "Parameter 2 :";
+            // 
+            // textBoxParameter2
+            // 
+            this.textBoxParameter2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxParameter2.Location = new System.Drawing.Point(720, 152);
+            this.textBoxParameter2.Name = "textBoxParameter2";
+            this.textBoxParameter2.Size = new System.Drawing.Size(100, 20);
+            this.textBoxParameter2.TabIndex = 10;
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(494, 124);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(70, 13);
+            this.label5.TabIndex = 9;
+            this.label5.Text = "Parameter 1 :";
+            // 
+            // textBoxParameter1
+            // 
+            this.textBoxParameter1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxParameter1.Location = new System.Drawing.Point(720, 117);
+            this.textBoxParameter1.Name = "textBoxParameter1";
+            this.textBoxParameter1.Size = new System.Drawing.Size(100, 20);
+            this.textBoxParameter1.TabIndex = 8;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(497, 81);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(88, 17);
+            this.checkBox1.TabIndex = 12;
+            this.checkBox1.Text = "Optimalizacia";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // textBoxOutput
+            // 
+            this.textBoxOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxOutput.Location = new System.Drawing.Point(15, 117);
+            this.textBoxOutput.Multiline = true;
+            this.textBoxOutput.Name = "textBoxOutput";
+            this.textBoxOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBoxOutput.Size = new System.Drawing.Size(473, 121);
+            this.textBoxOutput.TabIndex = 13;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(631, 21);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 14;
+            this.button2.Text = "Test";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(832, 272);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.textBoxOutput);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.textBoxParameter2);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.textBoxParameter1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textBoxPocetCakajucich);
             this.Controls.Add(this.labelSimulacnyCas);
@@ -135,6 +222,13 @@
         private System.Windows.Forms.Label labelSimulacnyCas;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxPocetCakajucich;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox textBoxParameter2;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox textBoxParameter1;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TextBox textBoxOutput;
+        private System.Windows.Forms.Button button2;
     }
 }
 

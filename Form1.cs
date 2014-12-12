@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
+using Santa.Jadro;
 
 namespace Santa
 {
@@ -20,8 +21,37 @@ namespace Santa
             //_jadro.ZmenaElfov += ZmenaPoctuElfov;
             //_jadro.ZmenaIndexu += ZmenaIndexu;
             //_jadro.ZmenaPoctuCakajucich += ZmenaPoctuCakajucich;
-            Thread t = new Thread(new ThreadStart(_jadro.Run));
-            t.Start();
+            textBoxOutput.Text = "";
+            _jadro.ZmenaReplikacie += ZmenaReplikacie;
+            if (checkBox1.Checked)
+            {
+                Thread t = new Thread(new ThreadStart(_jadro.Run));
+                t.Start();
+            }
+            else
+            {
+                Thread t = new Thread(new ParameterizedThreadStart(_jadro.Run));
+                var inp = new Tuple<string, string>(textBoxParameter1.Text, textBoxParameter2.Text); 
+                t.Start(inp);
+            }
+            
+        }
+
+        private void ZmenaReplikacie()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new MethodInvoker(delegate
+                {
+                    textBoxOutput.AppendText(_jadro.OutputText);
+                }));
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //JadroRand jadro = new JadroRand();
+            _jadro.Run2();
         }
 
         //private void ZmenaPoctuCakajucich()

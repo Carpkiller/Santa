@@ -1,5 +1,8 @@
-﻿namespace Santa.Abstract
+﻿using System;
+
+namespace Santa.Abstract
 {
+    [Serializable]
     public abstract class PrvokSystemu
     {
         private double casVstupuDoSystemu;

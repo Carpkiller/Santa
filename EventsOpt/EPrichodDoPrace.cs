@@ -6,15 +6,25 @@ namespace Santa.EventsOpt
     public class EPrichodDoPrace : UdalostOpt
     {
         private Elf _elf;
-        public EPrichodDoPrace(double prichod, Elf elf)
+        private bool Opti;
+        public EPrichodDoPrace(double prichod, Elf elf, bool opti)
         {
             _elf = elf;
             SetCas(prichod);
+            Opti = opti;
         }
 
         public override void Vykonaj(JadroOpt jadro)
         {
-            jadro.PrichodElfaDoPrace(_elf);
+            if (Opti)
+            {
+                jadro.PrichodElfaDoPrace(_elf);
+            }
+            else
+            {
+                jadro.PrichodElfaDoPracePrehadzovane(_elf);
+            }
+            
         }
     }
 }

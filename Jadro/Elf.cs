@@ -9,6 +9,8 @@ namespace Santa.Jadro
         public DateTime DostupnyOd { get; set; }
         public DateTime ZaciatokPRace { get; set; }
         public int Id { get; set; }
+        public DateTime DlzkaPrace { get; set; }
+        public int PocetSpracovanychHraciek { get; set; }
 
         public Elf(bool jeVolny, double vykonnost, int id, DateTime dostupnost)
         {

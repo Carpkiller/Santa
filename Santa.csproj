@@ -32,9 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
@@ -42,6 +45,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract\PrvokSystemu.cs" />
@@ -50,6 +54,7 @@
     <Compile Include="EventsOpt\EPrekonvertujHracky.cs" />
     <Compile Include="EventsOpt\EPrichodDoPrace.cs" />
     <Compile Include="EventsOpt\EPrichodNovehoVyrobku.cs" />
+    <Compile Include="EventsOpt\EUtriedHracky.cs" />
     <Compile Include="EventsOpt\EZaciatokPraceNaVyrobku.cs" />
     <Compile Include="Events\EKoniecPraceNaVyrobku.cs" />
     <Compile Include="Events\EPrichodDoPrace.cs" />
@@ -69,14 +74,19 @@
     <Compile Include="Jadro\Hracka.cs" />
     <Compile Include="Jadro\Jadro.cs" />
     <Compile Include="Jadro\JadroOpt.cs" />
+    <Compile Include="Jadro\JadroRand.cs" />
     <Compile Include="Jadro\KalendarUdalosti.cs" />
     <Compile Include="Jadro\KalendarUdalostiOpt.cs" />
+    <Compile Include="Jadro\ListRoztriedenychHraciek.cs" />
     <Compile Include="Jadro\Logovac.cs" />
     <Compile Include="Jadro\PriorFrontEvents.cs" />
     <Compile Include="Jadro\PriorFrontHracka.cs" />
     <Compile Include="Jadro\PriorFrontWorkers.cs" />
+    <Compile Include="Jadro\Rozhadzovac.cs" />
+    <Compile Include="Jadro\Triedic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serializer\Zapisovac.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -102,9 +112,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PriorityQueue\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
