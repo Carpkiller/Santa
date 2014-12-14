@@ -13,6 +13,7 @@ namespace Santa.EventsOpt
         public override void Vykonaj(JadroOpt jadro)
         {
             jadro.UtriedHracky();
+            jadro.NaplnPomocnyList();
         }
     }
 }

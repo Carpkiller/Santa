@@ -38,7 +38,9 @@ namespace Santa.Jadro
         private List<ListRoztriedenychHraciek> list;
         private int Index;
         private List<Hracka> ListHraciek;
+        private List<Hracka> pomListHraciek;
         private List<Tuple<int, int>> _listIndexov;
+        private bool prvaReorganizacia = true;
 
         public delegate void KoniecHandler();
 
@@ -57,9 +59,9 @@ namespace Santa.Jadro
             var vstup = NacitajPrichodyHraciek(out hracky);
             for (int k = 0; k < 20; k+=20)
             {
-                for (int j = 12; j <= 16; j++)
+                for (int j = 14; j <= 15; j++)
                 {
-                    for (double i = 0.25; i <= 0.75; i += 0.1)
+                    for (double i = 0.318; i <= 0.334; i += 0.002)
                     {
                         PARAMETER1 = i;
                         PARAMETER2 = j;
@@ -84,8 +86,6 @@ namespace Santa.Jadro
                             if (_kalendarUdalosti.IsEmpty())
                             {
                                 _koniec = true;
-                                //Console.WriteLine(DateTime.FromOADate(_simCas).ToString());
-                                //Console.WriteLine(DateTime.FromOADate(_simCas).ToLongTimeString());
                             }
                         }
                         Console.WriteLine(i + " , " + j + " , " + k + " - koniec : " +
@@ -113,6 +113,10 @@ namespace Santa.Jadro
             //_arrayHraciek = new Hracka[10000000];
             _listElfov = new PriorFrontWorkers();
             _listLog = new List<Logovac>();
+            for (int i = 0; i < _arrayHraciek.Length; i++)
+            {
+                _arrayHraciek[i].Dokoncena = false;
+            }
 
             for (int i = 0; i < 900; i++)
             {
@@ -121,10 +125,7 @@ namespace Santa.Jadro
                 _kalendarUdalosti.Vloz(new EPrichodDoPrace(DostupnyOdPrvehoDna().ToOADate(), elf, true),
                     DostupnyOdPrvehoDna().ToOADate());
             }
-            for (int i = 0; i < _arrayHraciek.Length; i++)
-            {
-                _arrayHraciek[i].Dokoncena = false;
-            }
+            
             _kalendarUdalosti.Vloz(new EPrekonvertujHracky(), DostupnyOdPrvehoDna().AddHours(-2).ToOADate());
             _kalendarUdalosti.Vloz(new EUtriedHracky(), DostupnyOdPrvehoDna().AddHours(-1).ToOADate());
             _koniec = false;
@@ -181,8 +182,8 @@ namespace Santa.Jadro
                 totalMinutes += int.Parse(values[2]);
 
                 if (hracka.DlzkaVyroby < 100) pocMensi100++;
-                if (hracka.DlzkaVyroby >= 100 && hracka.DlzkaVyroby < 1000) pocMensi1000++;
-                if (hracka.DlzkaVyroby >= 1000 && hracka.DlzkaVyroby < 20000) pocMensi20000++;
+                if (hracka.DlzkaVyroby >= 100 && hracka.DlzkaVyroby < 2400) pocMensi1000++;
+                if (hracka.DlzkaVyroby >= 2400 && hracka.DlzkaVyroby < 20000) pocMensi20000++;
                 if (hracka.DlzkaVyroby >= 20000) pocVacsi20000++;
                 
                 hracky[i] = hracka;
@@ -194,9 +195,10 @@ namespace Santa.Jadro
                 (endDate - startDate).TotalMilliseconds);
             Console.WriteLine("Dlzka nacitania " + duration);
 
+            
             Console.WriteLine("Pocet pod 100      :" + pocMensi100);
-            Console.WriteLine("Medzi 100 a 1000   :" + pocMensi1000);
-            Console.WriteLine("Medzi 1000 a 20 000:" + pocMensi20000);
+            Console.WriteLine("Medzi 100 a 2400   :" + pocMensi1000);
+            Console.WriteLine("Medzi 2400 a 20 000:" + pocMensi20000);
             Console.WriteLine("Nad 20000 :" + pocVacsi20000);
 
             Console.WriteLine(totalMinutes.ToString());
@@ -276,67 +278,144 @@ namespace Santa.Jadro
 
         public void PrichodElfaDoPrace(Elf worker)
         {
+            bool upravena = false;
             if (DateTime.FromOADate(_simCas).TimeOfDay < new TimeSpan(19, 0, 0) &&
                 DateTime.FromOADate(_simCas).TimeOfDay >= new TimeSpan(9, 0, 0))
             {
                 Hracka hracka;
-                if (worker.Vykonnost > PARAMETER1)
-                {
-                    hracka = PriradHracku(true, worker); // najdlhsia vyroba
-                }
-                else
-                {
-                    if (worker.Id < PARAMETER3)
+                //if (worker.Vykonnost >= 1 && pomListHraciek.Count > 0)
+                //{
+                //    hracka = pomListHraciek.First();
+                //    pomListHraciek.Remove(hracka);
+                //    hracka.Dokoncena = true;
+                //    _kalendarUdalosti.Vloz(new EZaciatokPraceNaVyrobku(worker, hracka, _simCas, true), _simCas);
+                //    OdIndex++;
+                //}
+                //else
+                //{
+
+                    if (worker.Vykonnost > PARAMETER1)
                     {
-                        hracka = PriradHracku(true, worker);
+                        hracka = PriradHracku(true, worker, out upravena); // najdlhsia vyroba
                     }
                     else
                     {
-                        hracka = PriradHracku(false, worker); // najkratsia vyroba
-                        //if (hracka.Id == 2394876)                        {                            Console.WriteLine("hahahahahahaah");                        }    
-                    }
-                }
-
-                if (hracka != null)
-                {
-                    var koniec = VypocitajKoniecPrace(worker, hracka);
-
-                    if (worker.DostupnyOd.Hour > PARAMETER2 &&
-                        koniec >
-                        new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 19, 0, 0))
-                    {
-                        var dostupnost =
-                            new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 9, 0, 0)
-                                .AddDays(1);
-                        worker.JeVolny = true;
-                        worker.DostupnyOd = dostupnost;
-                        _kalendarUdalosti.Vloz(new EPrichodDoPrace(dostupnost.ToOADate(), worker, true),
-                            dostupnost.ToOADate());
-                        
-                        if (worker.Vykonnost > PARAMETER1)
-                            indexHorny++;
+                        if (worker.Id < PARAMETER3)
+                        {
+                            hracka = PriradHracku(true, worker, out upravena);
+                        }
                         else
-                            indexDolny--;
+                        {
+                            hracka = PriradHracku(false, worker, out upravena); // najkratsia vyroba
+                            //if (hracka.Id == 2394876)                        {                            Console.WriteLine("hahahahahahaah");                        }    
+                        }
                     }
-                    else
+
+                    if (hracka != null)
                     {
-                        hracka.Dokoncena = true;
-                        _kalendarUdalosti.Vloz(new EZaciatokPraceNaVyrobku(worker, hracka, _simCas, true), _simCas);
-                        OdIndex++;
+                        var koniec = VypocitajKoniecPrace(worker, hracka);
+
+                        if (worker.DostupnyOd.Hour > PARAMETER2 &&
+                            koniec >
+                            new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 19, 0,
+                                0) && upravena == false)
+                        {
+                            var dostupnost =
+                                new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 9,
+                                    0, 0)
+                                    .AddDays(1);
+                            worker.JeVolny = true;
+                            worker.DostupnyOd = dostupnost;
+                            _kalendarUdalosti.Vloz(new EPrichodDoPrace(dostupnost.ToOADate(), worker, true),
+                                dostupnost.ToOADate());
+
+
+                            if (!upravena)
+                            {
+                                if (worker.Vykonnost > PARAMETER1)
+                                    indexHorny++;
+                                else
+                                    indexDolny--;
+                            }
+                        }
+                        else
+                        {
+                            hracka.Dokoncena = true;
+                            _kalendarUdalosti.Vloz(new EZaciatokPraceNaVyrobku(worker, hracka, _simCas, true), _simCas);
+                            OdIndex++;
+                        }
                     }
-                }
+                //}
             }
 
         }
 
 
-        private Hracka PriradHracku(bool najlhsia, Elf worker)
+        private Hracka PriradHracku(bool najlhsia, Elf worker, out bool upravena)
         {
+            upravena = false;
             //VypisPocetNespracovanych();
             if (indexDolny == indexHorny+1)
             {
                 //_koniec = true;
                 return null;
+            }
+            Hracka hracka = null;
+            if (worker.Id == 1)
+            {
+                
+            }
+            if (pomListHraciek.Count > 0 && worker.Vykonnost >= 1)
+            {
+                var najvhodnejsiaDlzka = PocitajDlzku(worker);
+                for (int i = 0; i < pomListHraciek.Count; i++)
+                {
+                    hracka = pomListHraciek[i];
+                    if (hracka.Id == 5455551)
+                    {
+
+                    }
+                    if (hracka.DlzkaVyroby <= najvhodnejsiaDlzka)
+                    {
+                        upravena = true;
+                        pomListHraciek.Remove(hracka);                        
+                        return hracka;
+                    }
+                }
+                //if (hracka == null)
+                
+                var index = -1;
+                for (int i = 0; i < _listIndexov.Count; i++)
+                {
+                    var vyk = _listIndexov[i].Item1 / worker.Vykonnost;
+                    if (vyk >= najvhodnejsiaDlzka)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+                var ind = index == -1 ? -1 : _listIndexov[index].Item2;
+                hracka = PrejdiVsetky(ind, false);
+                return hracka;
+                //for (int i = _listIndexov.Count-2; i >= 0; i--)
+                //{
+                //    hracka = PrejdiVsetky(_listIndexov[i].Item2, false);
+                //    if (hracka.Id == 5455551)
+                //    {
+
+                //    }
+                //    hracka.DlzkaSkutocnejVyroby = int.Parse(Math.Ceiling(hracka.DlzkaVyroby / worker.Vykonnost).ToString());
+                //    worker.ZaciatokPRace = worker.DostupnyOd;
+                //    var vykonnost = VypocitajRating(worker, hracka);
+                //    if (vykonnost >= worker.Vykonnost)
+                //    {
+                //        upravena = true;
+                //        //pomListHraciek.Remove(hracka);
+                //        return hracka;
+                //    }
+                //}
+
+
             }
             if (!najlhsia)
             {
@@ -374,7 +453,7 @@ namespace Santa.Jadro
                     }
                 }
             }
-            Hracka hracka = null;
+            hracka = null;
             if (najlhsia)
             {
                 indexHorny--;
@@ -388,6 +467,24 @@ namespace Santa.Jadro
                 return hracka;
             }            
             return null;
+        }
+
+        private int PocitajDlzku(Elf worker)
+        {
+            Hracka hracka = new Hracka(0, 0, 0, false);
+            for (int i = 710; i >= 1; i--)
+            {
+                hracka.DlzkaVyroby = i;
+                hracka.DlzkaSkutocnejVyroby = int.Parse(Math.Ceiling(hracka.DlzkaVyroby / worker.Vykonnost).ToString());
+                worker.ZaciatokPRace = worker.DostupnyOd;
+                var vykonnost = VypocitajRating(worker, hracka);
+                if (vykonnost >= worker.Vykonnost)
+                {
+                    //pomListHraciek.Remove(hracka);
+                    return i;
+                }
+            }
+            return 0;
         }
 
         private void VypisPocetNespracovanych()
@@ -475,13 +572,18 @@ namespace Santa.Jadro
 
         public void UvolniWorkera(Elf worker, Hracka hracka)
         {
+            if (worker.Id == 1)
+            {
+
+            }
             worker.JeVolny = true;
             worker.PocetSpracovanychHraciek++;
 
             CelkovyPocetSpracovanychHraciek++;
             //VypisPocetNespracovanych();
-            if (CelkovyPocetSpracovanychHraciek % 1000000 == 0)
+            if (CelkovyPocetSpracovanychHraciek % 1000000 == 0 || (pomListHraciek.Count==0 && prvaReorganizacia))
             {
+                prvaReorganizacia = false;
                 for (int i = 0; i < ArrayHraciek.Length; i++)
                 {
                     if (ArrayHraciek[i].Dokoncena)
@@ -687,48 +789,67 @@ namespace Santa.Jadro
         private void SpracujNezadaneHracky(Elf worker)
         {
             Hracka hracka;
-            var kratka = false;
-            if (worker.Vykonnost > PARAMETER1)
-            {
-                hracka = PriradHracku(true, worker); // najdlhsia vyroba
-            }
-            else
-            {
-                if (worker.Id < PARAMETER3)
+            bool upravena = false;
+            //if (worker.Vykonnost >= 1 && pomListHraciek.Count > 0)
+            //{
+            //    hracka = pomListHraciek.First();
+            //    pomListHraciek.Remove(hracka);
+            //    hracka.Dokoncena = true;
+            //    _kalendarUdalosti.Vloz(new EZaciatokPraceNaVyrobku(worker, hracka, _simCas, true), _simCas);
+            //    OdIndex++;
+            //}
+            //else
+            //{
+                var kratka = false;
+                if (worker.Vykonnost > PARAMETER1)
                 {
-                    hracka = PriradHracku(true, worker);
+                    hracka = PriradHracku(true, worker, out upravena); // najdlhsia vyroba
                 }
                 else
                 {
-                    hracka = PriradHracku(false, worker); // najkratsia vyroba
+                    if (worker.Id < PARAMETER3)
+                    {
+                        hracka = PriradHracku(true, worker, out upravena);
+                    }
+                    else
+                    {
+                        hracka = PriradHracku(false, worker, out upravena); // najkratsia vyroba
+                    }
+                    kratka = true;
                 }
-                kratka = true;
-            }
 
-            if (hracka != null)
-            {
-                var koniec = VypocitajKoniecPrace(worker, hracka);
-                if (worker.DostupnyOd.Hour > PARAMETER2 && koniec > new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 19, 0, 0))
+                if (hracka != null)
                 {
-                    var dostupnost = new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 9, 0, 0).AddDays(1);
+                    var koniec = VypocitajKoniecPrace(worker, hracka);
+                    if (worker.DostupnyOd.Hour > PARAMETER2 &&
+                        koniec >
+                        new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 19, 0, 0) 
+                        && upravena == false)
+                    {
+                        var dostupnost =
+                            new DateTime(worker.DostupnyOd.Year, worker.DostupnyOd.Month, worker.DostupnyOd.Day, 9, 0, 0)
+                                .AddDays(1);
                         worker.DostupnyOd = dostupnost;
                         worker.JeVolny = true;
                         _kalendarUdalosti.Vloz(new EPrichodDoPrace(dostupnost.ToOADate(), worker, true),
                             dostupnost.ToOADate());
 
-                        if (worker.Vykonnost > PARAMETER1)
-                            indexHorny++;
-                        else
-                            indexDolny--;
+                        if (!upravena)
+                        {
+                            if (worker.Vykonnost > PARAMETER1)
+                                indexHorny++;
+                            else
+                                indexDolny--;
+                        }
+                    }
+                    else
+                    {
+                        hracka.Dokoncena = true;
+                        _kalendarUdalosti.Vloz(new EZaciatokPraceNaVyrobku(worker, hracka, _simCas, true), _simCas);
+                        OdIndex++;
+                    }
                 }
-                else
-                {
-                    hracka.Dokoncena = true;
-                    _kalendarUdalosti.Vloz(new EZaciatokPraceNaVyrobku(worker, hracka, _simCas, true), _simCas);
-                    OdIndex++;
-                }
-            }
-
+            //}
             //if (worker.Id == 513 && hracka.Id == 3400){var d = DateTime.FromOADate(_simCas);}
         }
 
@@ -1024,6 +1145,15 @@ namespace Santa.Jadro
             var koniec = VypocitajKoniecPrace(worker, hracka);
             worker.JeVolny = false;
             _kalendarUdalosti.Vloz(new EKoniecNaVyrobku(worker, hracka, koniec.ToOADate(), false), koniec.ToOADate());
+        }
+
+        public void NaplnPomocnyList()
+        {
+            pomListHraciek = new List<Hracka>();
+            for (int i = _listIndexov[8].Item2; i > _listIndexov[7].Item2; i--)
+            {
+                pomListHraciek.Add(ArrayHraciek[i]);
+            }
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Santa.Jadro
         public static List<Tuple<int, int>> SpracujHracky(Hracka[] arrayHraciek)
         {
             var list = new List<Tuple<int, int>>();
-            var konstanty = new int[] {50, 100, 150, 182, 222, 271};
+            var konstanty = new int[] {10, 20, 50, 100, 150, 182, 222, 271, 730};
 
             foreach (var kons in konstanty)
             {
