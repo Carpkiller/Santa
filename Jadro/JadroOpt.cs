@@ -57,9 +57,9 @@ namespace Santa.Jadro
             var vstup = NacitajPrichodyHraciek(out hracky);
             for (int k = 0; k < 20; k+=20)
             {
-                for (int j = 12; j <= 16; j++)
+                for (int j = 14; j <= 14; j++)
                 {
-                    for (double i = 0.25; i <= 0.75; i += 0.1)
+                    for (double i = 0.3312; i <= 0.3335; i += 0.0001)
                     {
                         PARAMETER1 = i;
                         PARAMETER2 = j;

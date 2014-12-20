@@ -46,21 +46,31 @@ namespace Santa.Jadro
         public static List<Tuple<int, int>> SpracujHracky(Hracka[] arrayHraciek)
         {
             var list = new List<Tuple<int, int>>();
-            var konstanty = new int[] {50, 100, 150, 182, 222, 271};
+            var konstanty = new List<int>();
+            var pom = 1;
 
-            foreach (var kons in konstanty)
+            for (int i = 0; i < arrayHraciek.Length; i++)
             {
-                for (int i = 0; i < arrayHraciek.Length; i++)
+                if (arrayHraciek[i].DlzkaVyroby > pom)
                 {
-                    if (arrayHraciek[i].DlzkaVyroby > kons)
-                    {
-                        list.Add(new Tuple<int, int>(kons, i-1));
-                        //Console.WriteLine(arrayHraciek[i].DlzkaVyroby + " " + arrayHraciek[i-1].DlzkaVyroby+"  "+i);
-                        break;
-                    }
-
+                    list.Add(new Tuple<int, int>(pom, i-1));
+                    pom = arrayHraciek[i].DlzkaVyroby;
                 }
             }
+
+            //foreach (var kons in konstanty)
+            //{
+            //    for (int i = 0; i < arrayHraciek.Length; i++)
+            //    {
+            //        if (arrayHraciek[i].DlzkaVyroby > kons)
+            //        {
+            //            list.Add(new Tuple<int, int>(kons, i-1));
+            //            //Console.WriteLine(arrayHraciek[i].DlzkaVyroby + " " + arrayHraciek[i-1].DlzkaVyroby+"  "+i);
+            //            break;
+            //        }
+
+            //    }
+            //}
 
             return list;
         }
